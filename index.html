@@ -1198,6 +1198,7 @@
       posterEls.titolo.style.fontSize = `${titleSizing.baseTitlePt}pt`;
       posterEls.sottotitolo.style.fontSize = `${titleSizing.baseSubtitlePt}pt`;
 
+      const baseHeight = posterTextBlock?.getBoundingClientRect().height || 0;
       const computed = getComputedStyle(posterEls.titolo);
       const fontSizePx = parseFloat(computed.fontSize) || 0;
       let lineHeight = parseFloat(computed.lineHeight);
@@ -1226,7 +1227,12 @@
       );
       posterEls.titolo.style.fontSize = `${newTitlePt}pt`;
       posterEls.sottotitolo.style.fontSize = `${newSubtitlePt}pt`;
-      titleShrinkOffsetPx = (titleSizing.baseTitlePt - newTitlePt) * (96 / 72);
+      const newHeight = posterTextBlock?.getBoundingClientRect().height || 0;
+      if (baseHeight > 0 && newHeight > 0) {
+        titleShrinkOffsetPx = Math.max(0, baseHeight - newHeight);
+      } else {
+        titleShrinkOffsetPx = (titleSizing.baseTitlePt - newTitlePt) * (96 / 72);
+      }
     }
 
     let currentScale = 1;
