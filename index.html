@@ -1229,7 +1229,8 @@
       posterEls.sottotitolo.style.fontSize = `${newSubtitlePt}pt`;
       const newHeight = posterTextBlock?.getBoundingClientRect().height || 0;
       if (baseHeight > 0 && newHeight > 0) {
-        titleShrinkOffsetPx = Math.max(0, baseHeight - newHeight);
+        const shrink = Math.max(0, baseHeight - newHeight);
+        titleShrinkOffsetPx = shrink * 0.6;
       } else {
         titleShrinkOffsetPx = (titleSizing.baseTitlePt - newTitlePt) * (96 / 72);
       }
