@@ -1066,11 +1066,12 @@
     };
 
     const titleSizing = {
-      baseTitlePt: 60,
+      baseTitlePt: 70,
       baseSubtitlePt: 70,
       minTitlePt: 28,
       lineLengthMm: 230,
-      scaleTolerance: 1.15
+      scaleTolerance: 1.15,
+      wrapReductionPt: 4
     };
 
     function updateTemplate(indirizzo) {
@@ -1177,32 +1178,32 @@
 
     function fitTitleSizes() {
       if (!posterEls.titolo || !posterEls.sottotitolo) return;
-      const mmToPx = (mm) => (mm * 96) / 25.4;
-      const maxWidth =
-        posterTextBlock?.getBoundingClientRect().width || mmToPx(titleSizing.lineLengthMm);
 
       posterEls.titolo.style.fontSize = `${titleSizing.baseTitlePt}pt`;
       posterEls.sottotitolo.style.fontSize = `${titleSizing.baseSubtitlePt}pt`;
 
-      const previousWhiteSpace = posterEls.titolo.style.whiteSpace;
-      posterEls.titolo.style.whiteSpace = 'nowrap';
-      const nowrapWidth = posterEls.titolo.scrollWidth;
-      posterEls.titolo.style.whiteSpace = previousWhiteSpace || 'normal';
-
-      const softMaxWidth = maxWidth * (titleSizing.scaleTolerance || 1);
-      if (nowrapWidth > softMaxWidth) {
-        const scale = softMaxWidth / nowrapWidth;
-        const newTitlePt = Math.max(
-          titleSizing.minTitlePt,
-          Math.floor(titleSizing.baseTitlePt * scale)
-        );
-        const newSubtitlePt = Math.max(
-          12,
-          Math.round(titleSizing.baseSubtitlePt * (newTitlePt / titleSizing.baseTitlePt))
-        );
-        posterEls.titolo.style.fontSize = `${newTitlePt}pt`;
-        posterEls.sottotitolo.style.fontSize = `${newSubtitlePt}pt`;
+      const computed = getComputedStyle(posterEls.titolo);
+      const fontSizePx = parseFloat(computed.fontSize) || 0;
+      let lineHeight = parseFloat(computed.lineHeight);
+      if (!lineHeight || Number.isNaN(lineHeight)) {
+        lineHeight = fontSizePx * 1.02;
       }
+      if (!lineHeight) return;
+
+      const lineCount = Math.max(1, Math.ceil(posterEls.titolo.scrollHeight / lineHeight));
+      if (lineCount <= 1) return;
+
+      const reduction = (lineCount - 1) * (titleSizing.wrapReductionPt || 0);
+      const newTitlePt = Math.max(
+        titleSizing.minTitlePt,
+        titleSizing.baseTitlePt - reduction
+      );
+      const newSubtitlePt = Math.max(
+        12,
+        Math.round(titleSizing.baseSubtitlePt * (newTitlePt / titleSizing.baseTitlePt))
+      );
+      posterEls.titolo.style.fontSize = `${newTitlePt}pt`;
+      posterEls.sottotitolo.style.fontSize = `${newSubtitlePt}pt`;
     }
 
     let currentScale = 1;
