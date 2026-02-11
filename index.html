@@ -19,6 +19,7 @@
       --logo-down-width: 140.37mm;
       --info-down-width: 235.97mm;
       --line-length: 230mm;
+      --guide-left: 40mm;
       --icon-width: 70mm;
       --icon-gap: 5mm;
       --grid: rgba(17, 17, 17, 0.08);
@@ -298,7 +299,7 @@
 
     .poster-indirizzo-icon {
       position: absolute;
-      left: 40mm;
+      left: var(--guide-left);
       width: var(--icon-width);
       height: auto;
       z-index: 3;
@@ -329,7 +330,7 @@
 
     .subtitle-line {
       position: absolute;
-      left: 40mm;
+      left: var(--guide-left);
       width: var(--line-length);
       height: 1mm;
       background: #ffffff;
@@ -339,7 +340,7 @@
 
     .poster-docenti-block {
       position: absolute;
-      left: 40mm;
+      left: var(--guide-left);
       z-index: 3;
       pointer-events: none;
       color: #ffffff;
@@ -1072,11 +1073,8 @@
       baseTitlePt: 60,
       baseSubtitlePt: 47,
       minTitlePt: 28,
-      lineLengthMm: 230,
-      scaleTolerance: 1.15,
-      wrapReductionPt: 4
+      lineLengthMm: 230
     };
-    let titleShrinkOffsetPx = 0;
 
     function updateTemplate(indirizzo) {
       const tpl = templates[indirizzo] || templates.Informatica;
@@ -1197,43 +1195,6 @@
 
       posterEls.titolo.style.fontSize = `${titleSizing.baseTitlePt}pt`;
       posterEls.sottotitolo.style.fontSize = `${titleSizing.baseSubtitlePt}pt`;
-
-      const baseHeight = posterTextBlock?.getBoundingClientRect().height || 0;
-      const computed = getComputedStyle(posterEls.titolo);
-      const fontSizePx = parseFloat(computed.fontSize) || 0;
-      let lineHeight = parseFloat(computed.lineHeight);
-      if (!lineHeight || Number.isNaN(lineHeight)) {
-        lineHeight = fontSizePx * 1.02;
-      }
-      if (!lineHeight) {
-        titleShrinkOffsetPx = 0;
-        return;
-      }
-
-      const lineCount = Math.max(1, Math.ceil(posterEls.titolo.scrollHeight / lineHeight));
-      if (lineCount <= 1) {
-        titleShrinkOffsetPx = 0;
-        return;
-      }
-
-      const reduction = (lineCount - 1) * (titleSizing.wrapReductionPt || 0);
-      const newTitlePt = Math.max(
-        titleSizing.minTitlePt,
-        titleSizing.baseTitlePt - reduction
-      );
-      const newSubtitlePt = Math.max(
-        12,
-        Math.round(titleSizing.baseSubtitlePt * (newTitlePt / titleSizing.baseTitlePt))
-      );
-      posterEls.titolo.style.fontSize = `${newTitlePt}pt`;
-      posterEls.sottotitolo.style.fontSize = `${newSubtitlePt}pt`;
-      const newHeight = posterTextBlock?.getBoundingClientRect().height || 0;
-      if (baseHeight > 0 && newHeight > 0) {
-        const shrink = Math.max(0, baseHeight - newHeight);
-        titleShrinkOffsetPx = shrink * 0.6;
-      } else {
-        titleShrinkOffsetPx = (titleSizing.baseTitlePt - newTitlePt) * (96 / 72);
-      }
     }
 
     let currentScale = 1;
@@ -1404,30 +1365,22 @@
     function positionTitleBlock() {
       if (!posterTextBlock || !posterClasseTop) return;
       const mmToPx = (mm) => (mm * 96) / 25.4;
-      const shrinkOffset = titleShrinkOffsetPx || 0;
-      if (currentTemplate && currentTemplate.titleGapMm && currentTemplate.classTopMm) {
-        const top =
-          posterClasseTop.offsetTop +
-          posterClasseTop.offsetHeight +
-          mmToPx(currentTemplate.titleGapMm) -
-          shrinkOffset;
-        posterTextBlock.style.top = `${top}px`;
-        return;
-      }
-      const defaultTop = mmToPx(71) - shrinkOffset;
-      posterTextBlock.style.top = `${defaultTop}px`;
+      const gapMm = currentTemplate && currentTemplate.titleGapMm ? currentTemplate.titleGapMm : 20;
+      const top = posterClasseTop.offsetTop + posterClasseTop.offsetHeight + mmToPx(gapMm);
+      posterTextBlock.style.top = `${top}px`;
     }
 
     function positionClasseTop() {
-      if (!posterTextBlock || !posterClasseTop) return;
-      const mmToPx = (mm) => (mm * 96) / 25.4;
-      if (currentTemplate && currentTemplate.classTopMm) {
-        posterClasseTop.style.top = `${mmToPx(currentTemplate.classTopMm)}px`;
+      if (!posterClasseTop) return;
+      if (posterEls.anno) {
+        const annoTop = posterEls.anno.offsetTop - posterEls.anno.offsetHeight;
+        posterClasseTop.style.top = `${annoTop}px`;
         return;
       }
-      const baseTop = mmToPx(71);
-      const top = baseTop - posterClasseTop.offsetHeight - mmToPx(20);
-      posterClasseTop.style.top = `${top}px`;
+      if (currentTemplate && currentTemplate.classTopMm) {
+        const mmToPx = (mm) => (mm * 96) / 25.4;
+        posterClasseTop.style.top = `${mmToPx(currentTemplate.classTopMm)}px`;
+      }
     }
 
     function positionDocenti() {
@@ -1438,9 +1391,8 @@
     }
 
     function positionIndirizzoIcon() {
-      if (!posterSubtitleLine || !posterIndirizzoIcon) return;
-      const mmToPx = (mm) => (mm * 96) / 25.4;
-      const top = posterSubtitleLine.offsetTop - posterIndirizzoIcon.offsetHeight - mmToPx(15);
+      if (!posterTextBlock || !posterIndirizzoIcon || !posterEls.sottotitolo) return;
+      const top = posterTextBlock.offsetTop + posterEls.sottotitolo.offsetTop;
       posterIndirizzoIcon.style.top = `${top}px`;
     }
 
