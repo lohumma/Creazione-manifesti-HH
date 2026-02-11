@@ -753,8 +753,8 @@
         </div>
 
         <div class="field">
-          <label for="sottotitolo">Sottotitolo (max. 35 caratteri, spazi inclusi)</label>
-          <textarea id="sottotitolo" rows="2" maxlength="35" placeholder="Sottotitolo">Sottotitolo</textarea>
+          <label for="sottotitolo">Sottotitolo (max. 31 caratteri, spazi inclusi)</label>
+          <textarea id="sottotitolo" rows="2" maxlength="31" placeholder="Sottotitolo">Sottotitolo</textarea>
         </div>
 
         <div class="field">
@@ -1067,7 +1067,7 @@
     };
 
     const titleMaxChars = 22;
-    const subtitleMaxChars = 35;
+    const subtitleMaxChars = 31;
 
     const titleSizing = {
       baseTitlePt: 60,
@@ -1392,7 +1392,11 @@
 
     function positionIndirizzoIcon() {
       if (!posterTextBlock || !posterIndirizzoIcon || !posterEls.sottotitolo) return;
-      const top = posterTextBlock.offsetTop + posterEls.sottotitolo.offsetTop;
+      const top =
+        posterTextBlock.offsetTop +
+        posterEls.sottotitolo.offsetTop +
+        posterEls.sottotitolo.offsetHeight -
+        posterIndirizzoIcon.offsetHeight;
       posterIndirizzoIcon.style.top = `${top}px`;
     }
 
