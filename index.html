@@ -747,13 +747,13 @@
         </div>
 
         <div class="field">
-          <label for="titolo">Titolo esperienza</label>
-          <textarea id="titolo" rows="2" placeholder="Titolo esperienza">Titolo esperienza</textarea>
+          <label for="titolo">Titolo esperienza (max. 22 caratteri, spazi inclusi)</label>
+          <textarea id="titolo" rows="2" maxlength="22" placeholder="Titolo esperienza">Titolo esperienza</textarea>
         </div>
 
         <div class="field">
-          <label for="sottotitolo">Sottotitolo</label>
-          <textarea id="sottotitolo" rows="2" placeholder="Sottotitolo">Sottotitolo</textarea>
+          <label for="sottotitolo">Sottotitolo (max. 35 caratteri, spazi inclusi)</label>
+          <textarea id="sottotitolo" rows="2" maxlength="35" placeholder="Sottotitolo">Sottotitolo</textarea>
         </div>
 
         <div class="field">
@@ -1065,6 +1065,9 @@
       anno: 'Anno'
     };
 
+    const titleMaxChars = 22;
+    const subtitleMaxChars = 35;
+
     const titleSizing = {
       baseTitlePt: 60,
       baseSubtitlePt: 47,
@@ -1073,6 +1076,7 @@
       scaleTolerance: 1.15,
       wrapReductionPt: 4
     };
+    let titleShrinkOffsetPx = 0;
 
     function updateTemplate(indirizzo) {
       const tpl = templates[indirizzo] || templates.Informatica;
@@ -1169,6 +1173,18 @@
     }
 
     function updateText() {
+      if (controls.titolo) {
+        const trimmed = controls.titolo.value.slice(0, titleMaxChars);
+        if (controls.titolo.value !== trimmed) {
+          controls.titolo.value = trimmed;
+        }
+      }
+      if (controls.sottotitolo) {
+        const trimmed = controls.sottotitolo.value.slice(0, subtitleMaxChars);
+        if (controls.sottotitolo.value !== trimmed) {
+          controls.sottotitolo.value = trimmed;
+        }
+      }
       posterEls.titolo.textContent = valueOrFallback(controls.titolo.value, fallback.titolo);
       posterEls.sottotitolo.textContent = valueOrFallback(controls.sottotitolo.value, fallback.sottotitolo);
       posterEls.classe.textContent = formatClassiList(getClassiData());
@@ -1188,10 +1204,16 @@
       if (!lineHeight || Number.isNaN(lineHeight)) {
         lineHeight = fontSizePx * 1.02;
       }
-      if (!lineHeight) return;
+      if (!lineHeight) {
+        titleShrinkOffsetPx = 0;
+        return;
+      }
 
       const lineCount = Math.max(1, Math.ceil(posterEls.titolo.scrollHeight / lineHeight));
-      if (lineCount <= 1) return;
+      if (lineCount <= 1) {
+        titleShrinkOffsetPx = 0;
+        return;
+      }
 
       const reduction = (lineCount - 1) * (titleSizing.wrapReductionPt || 0);
       const newTitlePt = Math.max(
@@ -1204,6 +1226,7 @@
       );
       posterEls.titolo.style.fontSize = `${newTitlePt}pt`;
       posterEls.sottotitolo.style.fontSize = `${newSubtitlePt}pt`;
+      titleShrinkOffsetPx = (titleSizing.baseTitlePt - newTitlePt) * (96 / 72);
     }
 
     let currentScale = 1;
@@ -1374,15 +1397,18 @@
     function positionTitleBlock() {
       if (!posterTextBlock || !posterClasseTop) return;
       const mmToPx = (mm) => (mm * 96) / 25.4;
+      const shrinkOffset = titleShrinkOffsetPx || 0;
       if (currentTemplate && currentTemplate.titleGapMm && currentTemplate.classTopMm) {
         const top =
           posterClasseTop.offsetTop +
           posterClasseTop.offsetHeight +
-          mmToPx(currentTemplate.titleGapMm);
+          mmToPx(currentTemplate.titleGapMm) -
+          shrinkOffset;
         posterTextBlock.style.top = `${top}px`;
         return;
       }
-      posterTextBlock.style.top = '';
+      const defaultTop = mmToPx(71) - shrinkOffset;
+      posterTextBlock.style.top = `${defaultTop}px`;
     }
 
     function positionClasseTop() {
@@ -1392,7 +1418,8 @@
         posterClasseTop.style.top = `${mmToPx(currentTemplate.classTopMm)}px`;
         return;
       }
-      const top = posterTextBlock.offsetTop - posterClasseTop.offsetHeight - mmToPx(20);
+      const baseTop = mmToPx(71);
+      const top = baseTop - posterClasseTop.offsetHeight - mmToPx(20);
       posterClasseTop.style.top = `${top}px`;
     }
 
