@@ -305,9 +305,9 @@
 
     .poster-indirizzo-icon {
       position: absolute;
-      left: 50%;
-      right: auto;
-      transform: translateX(-50%);
+      right: 30mm;
+      left: auto;
+      transform: none;
       width: var(--icon-width);
       height: auto;
       z-index: 3;
@@ -367,7 +367,7 @@
       font-size: 33pt;
       font-weight: 400;
       line-height: 1.2;
-      white-space: normal;
+      white-space: pre-line;
       overflow-wrap: anywhere;
       word-break: break-word;
     }
@@ -1089,7 +1089,6 @@
     const posterIndirizzoIcon = document.getElementById('posterIndirizzoIcon');
     const posterUserImage = document.getElementById('posterUserImage');
     const posterUserImageImg = document.getElementById('posterUserImageImg');
-    const posterInfoDown = document.querySelector('.poster-info-down');
     const imageDrop = document.getElementById('imageDrop');
     const imageInput = document.getElementById('imageInput');
 
@@ -1198,7 +1197,7 @@
       }
 
       if (!groups.length) return fallback.docenti;
-      return formatListWithE(groups);
+      return groups.join('\n');
     }
 
     function getClassiData() {
@@ -1439,12 +1438,9 @@
       const frameHeight = imageFrame.bottomFrameHeightMm * pxPerMm;
       const frameTop = poster.offsetHeight - frameHeight;
       const top = frameTop + (frameHeight - posterIndirizzoIcon.offsetHeight) / 2;
-      let left = posterIndirizzoIcon.offsetWidth / 2;
-      if (posterInfoDown) {
-        left = posterInfoDown.offsetLeft / 2;
-      }
       posterIndirizzoIcon.style.top = `${top}px`;
-      posterIndirizzoIcon.style.left = `${left}px`;
+      posterIndirizzoIcon.style.left = 'auto';
+      posterIndirizzoIcon.style.right = '30mm';
     }
 
     function updateAll() {
