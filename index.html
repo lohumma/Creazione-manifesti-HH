@@ -277,30 +277,37 @@
 
     .poster-text-block {
       position: absolute;
-      left: calc(40mm + var(--icon-width) + var(--icon-gap));
+      left: var(--guide-left);
       top: 7.1cm;
       z-index: 3;
       display: flex;
       flex-direction: column;
-      width: calc(var(--line-length) - var(--icon-width) - var(--icon-gap));
+      width: var(--line-length);
+      max-width: var(--line-length);
       text-align: left;
     }
 
     .poster-classe-top {
       position: absolute;
-      left: 120mm;
+      left: var(--guide-left);
+      width: var(--line-length);
+      max-width: var(--line-length);
       font-family: 'Montserrat', var(--sans);
       font-size: 37pt;
       font-weight: 500;
       color: #ffffff;
       z-index: 3;
       pointer-events: none;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .poster-indirizzo-icon {
       position: absolute;
-      right: 40mm;
-      left: auto;
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
       width: var(--icon-width);
       height: auto;
       z-index: 3;
@@ -317,6 +324,9 @@
       color: #ffffff;
       white-space: normal;
       width: 100%;
+      max-width: var(--line-length);
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     #posterSubtitle {
@@ -327,6 +337,9 @@
       margin-top: 2mm;
       color: #ffffff;
       width: 100%;
+      max-width: var(--line-length);
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .subtitle-line {
@@ -342,6 +355,8 @@
     .poster-docenti-block {
       position: absolute;
       left: var(--guide-left);
+      width: var(--line-length);
+      max-width: var(--line-length);
       z-index: 3;
       pointer-events: none;
       color: #ffffff;
@@ -358,6 +373,9 @@
       font-size: 33pt;
       font-weight: 400;
       line-height: 1.2;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .docenti-list,
@@ -1101,12 +1119,6 @@
       if (posterEls.sottotitolo) {
         posterEls.sottotitolo.style.visibility = tpl.hideSubtitle ? 'hidden' : '';
       }
-      if (posterTextBlock) {
-        posterTextBlock.style.left = tpl.textLeft ? tpl.textLeft : '';
-      }
-      if (posterClasseTop) {
-        posterClasseTop.style.left = tpl.classLeft ? tpl.classLeft : '';
-      }
     }
 
     function valueOrFallback(value, fallbackText) {
@@ -1392,12 +1404,11 @@
     }
 
     function positionIndirizzoIcon() {
-      if (!posterTextBlock || !posterIndirizzoIcon || !posterEls.sottotitolo) return;
-      const top =
-        posterTextBlock.offsetTop +
-        posterEls.sottotitolo.offsetTop +
-        posterEls.sottotitolo.offsetHeight -
-        posterIndirizzoIcon.offsetHeight;
+      if (!poster || !posterIndirizzoIcon) return;
+      const pxPerMm = getPxPerMm();
+      const frameHeight = imageFrame.bottomFrameHeightMm * pxPerMm;
+      const frameTop = poster.offsetHeight - frameHeight;
+      const top = frameTop + (frameHeight - posterIndirizzoIcon.offsetHeight) / 2;
       posterIndirizzoIcon.style.top = `${top}px`;
     }
 
