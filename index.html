@@ -363,12 +363,6 @@
       font-family: 'Montserrat', var(--sans);
     }
 
-    .poster-docenti-label {
-      font-size: 33pt;
-      font-weight: 400;
-      margin-bottom: 4mm;
-    }
-
     .poster-docenti-list {
       font-size: 33pt;
       font-weight: 400;
@@ -405,6 +399,24 @@
       width: 60px;
       height: 1px;
       background: rgba(17, 17, 17, 0.35);
+    }
+
+    .docente-flags {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: rgba(17, 17, 17, 0.7);
+    }
+
+    .docente-flags label {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: none;
     }
 
     .dropzone {
@@ -790,6 +802,10 @@
             <div class="docente-row">
               <input type="text" class="docente-nome" placeholder="Nome Docente 1" />
               <input type="text" class="docente-cognome" placeholder="Cognome Docente 1" />
+              <div class="docente-flags">
+                <label><input type="radio" class="docente-prefix" name="docentePrefix1" value="prof" checked /> Prof.</label>
+                <label><input type="radio" class="docente-prefix" name="docentePrefix1" value="profssa" /> Prof.ssa</label>
+              </div>
             </div>
           </div>
           <button type="button" id="addDocenteBtn">Aggiungi docenti</button>
@@ -837,7 +853,6 @@
             </div>
             <div class="subtitle-line" id="posterSubtitleLine"></div>
             <div class="poster-docenti-block" id="posterDocentiBlock">
-              <div class="poster-docenti-label">Proff.</div>
               <div class="poster-docenti-list" id="posterDocentiList">Nome Cognome</div>
             </div>
 
@@ -1074,6 +1089,7 @@
     const posterIndirizzoIcon = document.getElementById('posterIndirizzoIcon');
     const posterUserImage = document.getElementById('posterUserImage');
     const posterUserImageImg = document.getElementById('posterUserImageImg');
+    const posterInfoDown = document.querySelector('.poster-info-down');
     const imageDrop = document.getElementById('imageDrop');
     const imageInput = document.getElementById('imageInput');
 
@@ -1151,24 +1167,38 @@
         .map((row) => {
           const nome = row.querySelector('.docente-nome')?.value ?? '';
           const cognome = row.querySelector('.docente-cognome')?.value ?? '';
-          return { nome: nome.trim(), cognome: cognome.trim() };
+          const prefix = row.querySelector('.docente-prefix:checked')?.value ?? 'prof';
+          return { nome: nome.trim(), cognome: cognome.trim(), prefix };
         })
         .filter(({ nome, cognome }) => nome.length || cognome.length);
     }
 
     function formatDocentiList(docenti) {
       if (!docenti.length) return fallback.docenti;
-      const names = docenti
-        .map(({ nome, cognome }) => {
+      const normalized = docenti
+        .map(({ nome, cognome, prefix }) => {
           const parts = [];
           if (nome) parts.push(toTitleCase(nome));
           if (cognome) parts.push(toTitleCase(cognome));
-          return parts.join(' ').trim();
+          return { fullName: parts.join(' ').trim(), prefix: prefix === 'profssa' ? 'profssa' : 'prof' };
         })
-        .filter(Boolean);
+        .filter((item) => item.fullName);
+      if (!normalized.length) return fallback.docenti;
 
-      if (!names.length) return fallback.docenti;
-      return formatListWithE(names);
+      const prof = normalized.filter((item) => item.prefix === 'prof').map((item) => item.fullName);
+      const profssa = normalized.filter((item) => item.prefix === 'profssa').map((item) => item.fullName);
+      const groups = [];
+
+      if (prof.length) {
+        groups.push(`Prof. ${formatListWithE(prof)}`);
+      }
+      if (profssa.length) {
+        const label = profssa.length > 1 ? 'Prof.sse' : 'Prof.ssa';
+        groups.push(`${label} ${formatListWithE(profssa)}`);
+      }
+
+      if (!groups.length) return fallback.docenti;
+      return formatListWithE(groups);
     }
 
     function getClassiData() {
@@ -1379,7 +1409,7 @@
       if (!posterTextBlock || !posterClasseTop) return;
       const mmToPx = (mm) => (mm * 96) / 25.4;
       const gapMm = currentTemplate && currentTemplate.titleGapMm ? currentTemplate.titleGapMm : 20;
-      const top = posterClasseTop.offsetTop + posterClasseTop.offsetHeight + mmToPx(gapMm);
+      const top = posterClasseTop.offsetTop + posterClasseTop.offsetHeight + mmToPx(gapMm - 5);
       posterTextBlock.style.top = `${top}px`;
     }
 
@@ -1409,7 +1439,12 @@
       const frameHeight = imageFrame.bottomFrameHeightMm * pxPerMm;
       const frameTop = poster.offsetHeight - frameHeight;
       const top = frameTop + (frameHeight - posterIndirizzoIcon.offsetHeight) / 2;
+      let left = posterIndirizzoIcon.offsetWidth / 2;
+      if (posterInfoDown) {
+        left = posterInfoDown.offsetLeft / 2;
+      }
       posterIndirizzoIcon.style.top = `${top}px`;
+      posterIndirizzoIcon.style.left = `${left}px`;
     }
 
     function updateAll() {
@@ -1478,8 +1513,16 @@
       cognome.className = 'docente-cognome';
       cognome.placeholder = `Cognome Docente ${docenteCount}`;
 
+      const flags = document.createElement('div');
+      flags.className = 'docente-flags';
+      flags.innerHTML = `
+        <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="prof" checked /> Prof.</label>
+        <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="profssa" /> Prof.ssa</label>
+      `;
+
       row.appendChild(nome);
       row.appendChild(cognome);
+      row.appendChild(flags);
       docentiList.appendChild(row);
       updateAll();
     }
