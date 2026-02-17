@@ -800,12 +800,12 @@
           <label>Docenti</label>
           <div class="docenti-list" id="docentiList">
             <div class="docente-row">
-              <input type="text" class="docente-nome" placeholder="Nome Docente 1" />
-              <input type="text" class="docente-cognome" placeholder="Cognome Docente 1" />
               <div class="docente-flags">
                 <label><input type="radio" class="docente-prefix" name="docentePrefix1" value="prof" checked /> Prof.</label>
                 <label><input type="radio" class="docente-prefix" name="docentePrefix1" value="profssa" /> Prof.ssa</label>
               </div>
+              <input type="text" class="docente-nome" placeholder="Nome Docente 1" />
+              <input type="text" class="docente-cognome" placeholder="Cognome Docente 1" />
             </div>
           </div>
           <button type="button" id="addDocenteBtn">Aggiungi docenti</button>
@@ -1516,9 +1516,9 @@
         <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="profssa" /> Prof.ssa</label>
       `;
 
+      row.appendChild(flags);
       row.appendChild(nome);
       row.appendChild(cognome);
-      row.appendChild(flags);
       docentiList.appendChild(row);
       updateAll();
     }
@@ -1684,3 +1684,4 @@
   </script>
 </body>
 </html>
+
