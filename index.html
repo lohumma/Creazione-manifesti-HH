@@ -1256,14 +1256,17 @@
 
     function fitTitleInBox() {
       if (!posterEls.titolo) return;
-      const minTitlePt = 18;
+      const minTitlePt = 8;
       let currentPt = titleSizing.baseTitlePt;
       posterEls.titolo.style.fontSize = `${currentPt}pt`;
 
       while (currentPt > minTitlePt) {
-        const exceedsHeight = posterEls.titolo.scrollHeight > posterEls.titolo.clientHeight + 1;
+        const contentHeight = getTextContentHeightPx(posterEls.titolo);
+        const lineCount = getTextLineCount(posterEls.titolo, contentHeight);
+        const exceedsHeight = contentHeight > posterEls.titolo.clientHeight + 1;
         const exceedsWidth = posterEls.titolo.scrollWidth > posterEls.titolo.clientWidth + 1;
-        if (!exceedsHeight && !exceedsWidth) break;
+        const exceedsLines = lineCount > 2;
+        if (!exceedsHeight && !exceedsWidth && !exceedsLines) break;
         currentPt -= 0.5;
         posterEls.titolo.style.fontSize = `${currentPt}pt`;
       }
@@ -1271,16 +1274,19 @@
 
     function fitSubtitleInBox() {
       if (!posterEls.sottotitolo) return;
-      const minSubtitlePt = 14;
+      const minSubtitlePt = 8;
       let currentPt = titleSizing.baseSubtitlePt;
       posterEls.sottotitolo.style.fontSize = `${currentPt}pt`;
 
       while (currentPt > minSubtitlePt) {
+        const contentHeight = getTextContentHeightPx(posterEls.sottotitolo);
+        const lineCount = getTextLineCount(posterEls.sottotitolo, contentHeight);
         const exceedsHeight =
-          posterEls.sottotitolo.scrollHeight > posterEls.sottotitolo.clientHeight + 1;
+          contentHeight > posterEls.sottotitolo.clientHeight + 1;
         const exceedsWidth =
           posterEls.sottotitolo.scrollWidth > posterEls.sottotitolo.clientWidth + 1;
-        if (!exceedsHeight && !exceedsWidth) break;
+        const exceedsLines = lineCount > 2;
+        if (!exceedsHeight && !exceedsWidth && !exceedsLines) break;
         currentPt -= 0.5;
         posterEls.sottotitolo.style.fontSize = `${currentPt}pt`;
       }
@@ -1311,6 +1317,13 @@
       const lineHeight = parseFloat(window.getComputedStyle(element).lineHeight);
       if (!Number.isFinite(lineHeight) || lineHeight <= 0) return false;
       return contentHeightPx <= lineHeight * 1.25;
+    }
+
+    function getTextLineCount(element, contentHeightPx) {
+      if (!element) return 0;
+      const lineHeight = parseFloat(window.getComputedStyle(element).lineHeight);
+      if (!Number.isFinite(lineHeight) || lineHeight <= 0) return 1;
+      return Math.max(1, Math.ceil((contentHeightPx - 1) / lineHeight));
     }
 
     function updateTitleSubtitleSpacing() {
