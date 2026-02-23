@@ -789,13 +789,13 @@
         </div>
 
         <div class="field">
-          <label for="titolo">Titolo esperienza (max. 22 caratteri, spazi inclusi)</label>
-          <textarea id="titolo" rows="2" maxlength="22" placeholder="Titolo esperienza">Titolo esperienza</textarea>
+          <label for="titolo">Titolo esperienza (max. 30 caratteri, spazi inclusi)</label>
+          <textarea id="titolo" rows="2" maxlength="30" placeholder="Titolo esperienza">Titolo esperienza</textarea>
         </div>
 
         <div class="field">
-          <label for="sottotitolo">Sottotitolo (max. 50 caratteri, spazi inclusi)</label>
-          <textarea id="sottotitolo" rows="2" maxlength="50" placeholder="Sottotitolo">Sottotitolo</textarea>
+          <label for="sottotitolo">Sottotitolo (max. 60 caratteri, spazi inclusi)</label>
+          <textarea id="sottotitolo" rows="2" maxlength="60" placeholder="Sottotitolo">Sottotitolo</textarea>
         </div>
 
         <div class="field">
@@ -942,9 +942,7 @@
         hideSubtitle: true,
         textLeft: '40mm',
         classLeft: '40mm',
-        classTopMm: 40,
-        titleGapMm: 12,
-        titleLineGapMm: 12
+        classTopMm: 40
       },
       Biologia: {
         accent: '#00a3ff',
@@ -955,9 +953,7 @@
         hideSubtitle: true,
         textLeft: '40mm',
         classLeft: '40mm',
-        classTopMm: 40,
-        titleGapMm: 12,
-        titleLineGapMm: 12
+        classTopMm: 40
       },
       Standard: {
         accent: '#00a3ff',
@@ -968,9 +964,7 @@
         hideSubtitle: true,
         textLeft: '40mm',
         classLeft: '40mm',
-        classTopMm: 40,
-        titleGapMm: 12,
-        titleLineGapMm: 12
+        classTopMm: 40
       }
     };
 
@@ -1111,8 +1105,8 @@
       anno: 'Anno'
     };
 
-    const titleMaxChars = 22;
-    const subtitleMaxChars = 50;
+    const titleMaxChars = 30;
+    const subtitleMaxChars = 60;
 
     const titleSizing = {
       baseTitlePt: 60,
@@ -1422,20 +1416,11 @@
     function positionSubtitleLine() {
       if (!posterTextBlock || !posterSubtitleLine || !posterEls.sottotitolo) return;
       const mmToPx = (mm) => (mm * 96) / 25.4;
-      if (currentTemplate && currentTemplate.titleLineGapMm) {
-        const titleEl = posterEls.titolo;
-        const top =
-          posterTextBlock.offsetTop +
-          (titleEl ? titleEl.offsetTop + titleEl.offsetHeight : 0) +
-          mmToPx(currentTemplate.titleLineGapMm);
-        posterSubtitleLine.style.top = `${top}px`;
-        return;
-      }
       const top =
         posterTextBlock.offsetTop +
         posterEls.sottotitolo.offsetTop +
         posterEls.sottotitolo.offsetHeight +
-        mmToPx(13);
+        mmToPx(10);
       posterSubtitleLine.style.top = `${top}px`;
     }
 
@@ -1470,7 +1455,7 @@
     function positionDocenti() {
       if (!posterSubtitleLine || !posterDocentiBlock) return;
       const mmToPx = (mm) => (mm * 96) / 25.4;
-      const top = posterSubtitleLine.offsetTop + posterSubtitleLine.offsetHeight + mmToPx(14);
+      const top = posterSubtitleLine.offsetTop + posterSubtitleLine.offsetHeight + mmToPx(10);
       posterDocentiBlock.style.top = `${top}px`;
     }
 
