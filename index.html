@@ -357,6 +357,9 @@
       left: var(--guide-left);
       width: var(--line-length);
       max-width: var(--line-length);
+      height: 40mm;
+      max-height: 40mm;
+      overflow: hidden;
       z-index: 3;
       pointer-events: none;
       color: #ffffff;
@@ -364,12 +367,16 @@
     }
 
     .poster-docenti-list {
+      display: block;
+      width: 100%;
+      max-height: 100%;
       font-size: 33pt;
       font-weight: 400;
       line-height: 1.2;
       white-space: pre-line;
       overflow-wrap: anywhere;
       word-break: break-word;
+      overflow: hidden;
     }
 
     .docenti-list,
@@ -841,7 +848,7 @@
               <img class="poster-info-down" src="Frame/info_down.svg" alt="" />
             </div>
             <div class="poster-anno-top" id="posterAnnoTop">2025/26</div>
-            <img class="poster-logo-up" src="Frame/loghi_up.svg" alt="" />
+            <img class="poster-logo-up" id="posterLogoUp" src="Frame/loghi_up.svg" alt="" />
             <img class="poster-indirizzo-icon" id="posterIndirizzoIcon" src="Frame/info_icon.svg" alt="" />
             <div class="poster-classe-top" id="posterClasseTop">4A INF</div>
             <div class="poster-user-image" id="posterUserImage">
@@ -1082,6 +1089,7 @@
     const posterSubtitleLine = document.getElementById('posterSubtitleLine');
     const posterClasseTop = document.getElementById('posterClasseTop');
     const posterDocentiBlock = document.getElementById('posterDocentiBlock');
+    const posterLogoUp = document.getElementById('posterLogoUp');
     const docentiList = document.getElementById('docentiList');
     const addDocenteBtn = document.getElementById('addDocenteBtn');
     const classiList = document.getElementById('classiList');
@@ -1108,6 +1116,12 @@
       baseSubtitlePt: 47,
       minTitlePt: 28,
       lineLengthMm: 230
+    };
+
+    const docentiSizing = {
+      basePt: 33,
+      minPt: 18,
+      boxHeightMm: 40
     };
 
     function updateTemplate(indirizzo) {
@@ -1237,6 +1251,24 @@
 
       posterEls.titolo.style.fontSize = `${titleSizing.baseTitlePt}pt`;
       posterEls.sottotitolo.style.fontSize = `${titleSizing.baseSubtitlePt}pt`;
+    }
+
+    function fitDocentiText() {
+      if (!posterDocentiBlock || !posterEls.docenti) return;
+      const mmToPx = (mm) => (mm * 96) / 25.4;
+      const maxHeightPx = mmToPx(docentiSizing.boxHeightMm);
+      posterDocentiBlock.style.height = `${maxHeightPx}px`;
+      posterDocentiBlock.style.maxHeight = `${maxHeightPx}px`;
+      posterEls.docenti.style.fontSize = `${docentiSizing.basePt}pt`;
+
+      let currentPt = docentiSizing.basePt;
+      while (currentPt > docentiSizing.minPt) {
+        const exceedsHeight = posterEls.docenti.scrollHeight > posterDocentiBlock.clientHeight + 1;
+        const exceedsWidth = posterEls.docenti.scrollWidth > posterDocentiBlock.clientWidth + 1;
+        if (!exceedsHeight && !exceedsWidth) break;
+        currentPt -= 0.5;
+        posterEls.docenti.style.fontSize = `${currentPt}pt`;
+      }
     }
 
     let currentScale = 1;
@@ -1415,14 +1447,25 @@
     function positionClasseTop() {
       if (!posterClasseTop) return;
       if (posterEls.anno) {
-        const annoTop = posterEls.anno.offsetTop - posterEls.anno.offsetHeight;
-        posterClasseTop.style.top = `${annoTop}px`;
+        const annoBottom = posterEls.anno.offsetTop;
+        const classTop = annoBottom - posterClasseTop.offsetHeight;
+        posterClasseTop.style.top = `${classTop}px`;
         return;
       }
       if (currentTemplate && currentTemplate.classTopMm) {
         const mmToPx = (mm) => (mm * 96) / 25.4;
         posterClasseTop.style.top = `${mmToPx(currentTemplate.classTopMm)}px`;
       }
+    }
+
+    function positionLogoUp() {
+      if (!posterLogoUp || !posterTextBlock || !posterEls.sottotitolo) return;
+      const subtitleBottom =
+        posterTextBlock.offsetTop +
+        posterEls.sottotitolo.offsetTop +
+        posterEls.sottotitolo.offsetHeight;
+      const logoTop = Math.max(0, subtitleBottom - posterLogoUp.offsetHeight);
+      posterLogoUp.style.top = `${logoTop}px`;
     }
 
     function positionDocenti() {
@@ -1450,8 +1493,10 @@
       positionImageFrame();
       positionClasseTop();
       positionTitleBlock();
+      positionLogoUp();
       positionSubtitleLine();
       positionDocenti();
+      fitDocentiText();
       positionIndirizzoIcon();
       fitPreview();
     }
@@ -1674,8 +1719,10 @@
           fitTitleSizes();
           positionClasseTop();
           positionTitleBlock();
+          positionLogoUp();
           positionSubtitleLine();
           positionDocenti();
+          fitDocentiText();
           positionIndirizzoIcon();
           fitPreview();
         });
