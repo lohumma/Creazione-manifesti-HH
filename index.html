@@ -1286,6 +1286,48 @@
       }
     }
 
+    function getTextContentHeightPx(element) {
+      if (!element) return 0;
+      const clone = element.cloneNode(true);
+      clone.style.position = 'absolute';
+      clone.style.left = '-10000px';
+      clone.style.top = '0';
+      clone.style.height = 'auto';
+      clone.style.maxHeight = 'none';
+      clone.style.minHeight = '0';
+      clone.style.overflow = 'visible';
+      clone.style.visibility = 'hidden';
+      clone.style.pointerEvents = 'none';
+      clone.style.margin = '0';
+      clone.style.width = `${element.clientWidth}px`;
+      document.body.appendChild(clone);
+      const height = clone.getBoundingClientRect().height;
+      clone.remove();
+      return height;
+    }
+
+    function isSingleLineText(element, contentHeightPx) {
+      if (!element) return false;
+      const lineHeight = parseFloat(window.getComputedStyle(element).lineHeight);
+      if (!Number.isFinite(lineHeight) || lineHeight <= 0) return false;
+      return contentHeightPx <= lineHeight * 1.25;
+    }
+
+    function updateTitleSubtitleSpacing() {
+      if (!posterEls.titolo || !posterEls.sottotitolo) return;
+      const mmToPx = (mm) => (mm * 96) / 25.4;
+
+      const titleContentHeight = getTextContentHeightPx(posterEls.titolo);
+      const subtitleContentHeight = getTextContentHeightPx(posterEls.sottotitolo);
+      const titleSingleLine = isSingleLineText(posterEls.titolo, titleContentHeight);
+      const subtitleSingleLine = isSingleLineText(posterEls.sottotitolo, subtitleContentHeight);
+
+      const desiredGapMm = titleSingleLine && subtitleSingleLine ? 7 : 2;
+      const freeTitleSpacePx = Math.max(0, posterEls.titolo.clientHeight - titleContentHeight);
+      const subtitleMarginTopPx = mmToPx(desiredGapMm) - freeTitleSpacePx;
+      posterEls.sottotitolo.style.marginTop = `${subtitleMarginTopPx}px`;
+    }
+
     function fitDocentiText() {
       if (!posterDocentiBlock || !posterEls.docenti) return;
       const mmToPx = (mm) => (mm * 96) / 25.4;
@@ -1452,10 +1494,11 @@
     function positionSubtitleLine() {
       if (!posterTextBlock || !posterSubtitleLine || !posterEls.sottotitolo) return;
       const mmToPx = (mm) => (mm * 96) / 25.4;
+      const subtitleContentHeight = getTextContentHeightPx(posterEls.sottotitolo);
       const top =
         posterTextBlock.offsetTop +
         posterEls.sottotitolo.offsetTop +
-        posterEls.sottotitolo.offsetHeight +
+        subtitleContentHeight +
         mmToPx(10);
       posterSubtitleLine.style.top = `${top}px`;
     }
@@ -1512,6 +1555,7 @@
       fitTitleSizes();
       fitTitleInBox();
       fitSubtitleInBox();
+      updateTitleSubtitleSpacing();
       positionImageFrame();
       positionClasseTop();
       positionTitleBlock();
@@ -1741,6 +1785,7 @@
           fitTitleSizes();
           fitTitleInBox();
           fitSubtitleInBox();
+          updateTitleSubtitleSpacing();
           positionClasseTop();
           positionTitleBlock();
           positionLogoUp();
