@@ -1269,6 +1269,23 @@
       }
     }
 
+    function fitSubtitleInBox() {
+      if (!posterEls.sottotitolo) return;
+      const minSubtitlePt = 14;
+      let currentPt = titleSizing.baseSubtitlePt;
+      posterEls.sottotitolo.style.fontSize = `${currentPt}pt`;
+
+      while (currentPt > minSubtitlePt) {
+        const exceedsHeight =
+          posterEls.sottotitolo.scrollHeight > posterEls.sottotitolo.clientHeight + 1;
+        const exceedsWidth =
+          posterEls.sottotitolo.scrollWidth > posterEls.sottotitolo.clientWidth + 1;
+        if (!exceedsHeight && !exceedsWidth) break;
+        currentPt -= 0.5;
+        posterEls.sottotitolo.style.fontSize = `${currentPt}pt`;
+      }
+    }
+
     function fitDocentiText() {
       if (!posterDocentiBlock || !posterEls.docenti) return;
       const mmToPx = (mm) => (mm * 96) / 25.4;
@@ -1494,6 +1511,7 @@
       updateText();
       fitTitleSizes();
       fitTitleInBox();
+      fitSubtitleInBox();
       positionImageFrame();
       positionClasseTop();
       positionTitleBlock();
@@ -1722,6 +1740,7 @@
         document.fonts.ready.then(() => {
           fitTitleSizes();
           fitTitleInBox();
+          fitSubtitleInBox();
           positionClasseTop();
           positionTitleBlock();
           positionLogoUp();
