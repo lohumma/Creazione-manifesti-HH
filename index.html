@@ -316,6 +316,7 @@
 
 
     #posterTitle {
+      display: block;
       font-family: 'Montserrat', var(--sans);
       font-size: 60pt;
       font-weight: 900;
@@ -325,8 +326,11 @@
       white-space: normal;
       width: 100%;
       max-width: var(--line-length);
+      height: 50mm;
+      max-height: 50mm;
       overflow-wrap: anywhere;
       word-break: break-word;
+      overflow: hidden;
     }
 
     #posterSubtitle {
@@ -1250,6 +1254,21 @@
       posterEls.sottotitolo.style.fontSize = `${titleSizing.baseSubtitlePt}pt`;
     }
 
+    function fitTitleInBox() {
+      if (!posterEls.titolo) return;
+      const minTitlePt = 18;
+      let currentPt = titleSizing.baseTitlePt;
+      posterEls.titolo.style.fontSize = `${currentPt}pt`;
+
+      while (currentPt > minTitlePt) {
+        const exceedsHeight = posterEls.titolo.scrollHeight > posterEls.titolo.clientHeight + 1;
+        const exceedsWidth = posterEls.titolo.scrollWidth > posterEls.titolo.clientWidth + 1;
+        if (!exceedsHeight && !exceedsWidth) break;
+        currentPt -= 0.5;
+        posterEls.titolo.style.fontSize = `${currentPt}pt`;
+      }
+    }
+
     function fitDocentiText() {
       if (!posterDocentiBlock || !posterEls.docenti) return;
       const mmToPx = (mm) => (mm * 96) / 25.4;
@@ -1474,6 +1493,7 @@
       updateTemplate(controls.indirizzo.value);
       updateText();
       fitTitleSizes();
+      fitTitleInBox();
       positionImageFrame();
       positionClasseTop();
       positionTitleBlock();
@@ -1701,6 +1721,7 @@
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(() => {
           fitTitleSizes();
+          fitTitleInBox();
           positionClasseTop();
           positionTitleBlock();
           positionLogoUp();
