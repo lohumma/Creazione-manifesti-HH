@@ -338,8 +338,11 @@
       color: #ffffff;
       width: 100%;
       max-width: var(--line-length);
+      height: 30mm;
+      max-height: 30mm;
       overflow-wrap: anywhere;
       word-break: break-word;
+      overflow: hidden;
     }
 
     .subtitle-line {
@@ -791,8 +794,8 @@
         </div>
 
         <div class="field">
-          <label for="sottotitolo">Sottotitolo (max. 31 caratteri, spazi inclusi)</label>
-          <textarea id="sottotitolo" rows="2" maxlength="31" placeholder="Sottotitolo">Sottotitolo</textarea>
+          <label for="sottotitolo">Sottotitolo (max. 50 caratteri, spazi inclusi)</label>
+          <textarea id="sottotitolo" rows="2" maxlength="50" placeholder="Sottotitolo">Sottotitolo</textarea>
         </div>
 
         <div class="field">
@@ -1109,11 +1112,11 @@
     };
 
     const titleMaxChars = 22;
-    const subtitleMaxChars = 31;
+    const subtitleMaxChars = 50;
 
     const titleSizing = {
       baseTitlePt: 60,
-      baseSubtitlePt: 47,
+      baseSubtitlePt: 35,
       minTitlePt: 28,
       lineLengthMm: 230
     };
