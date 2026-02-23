@@ -1407,8 +1407,8 @@
     function positionTitleBlock() {
       if (!posterTextBlock || !posterClasseTop) return;
       const mmToPx = (mm) => (mm * 96) / 25.4;
-      const gapMm = currentTemplate && currentTemplate.titleGapMm ? currentTemplate.titleGapMm : 20;
-      const top = posterClasseTop.offsetTop + posterClasseTop.offsetHeight + mmToPx(gapMm - 5);
+      const gapMm = 7;
+      const top = posterClasseTop.offsetTop + posterClasseTop.offsetHeight + mmToPx(gapMm);
       posterTextBlock.style.top = `${top}px`;
     }
 
@@ -1684,6 +1684,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
