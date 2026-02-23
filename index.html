@@ -1459,13 +1459,9 @@
     }
 
     function positionLogoUp() {
-      if (!posterLogoUp || !posterTextBlock || !posterEls.sottotitolo) return;
-      const subtitleBottom =
-        posterTextBlock.offsetTop +
-        posterEls.sottotitolo.offsetTop +
-        posterEls.sottotitolo.offsetHeight;
-      const logoTop = Math.max(0, subtitleBottom - posterLogoUp.offsetHeight);
-      posterLogoUp.style.top = `${logoTop}px`;
+      if (!posterLogoUp || !posterTextBlock || !posterEls.titolo) return;
+      const titleTop = posterTextBlock.offsetTop + posterEls.titolo.offsetTop;
+      posterLogoUp.style.top = `${Math.max(0, titleTop)}px`;
     }
 
     function positionDocenti() {
