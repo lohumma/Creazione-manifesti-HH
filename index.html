@@ -443,6 +443,13 @@
       text-transform: none;
     }
 
+    .docente-prefix-custom {
+      min-width: 90px;
+      max-width: 140px;
+      font-size: 13px;
+      padding: 6px 8px;
+    }
+
     .dropzone {
       border: 2px dashed rgba(17, 17, 17, 0.3);
       border-radius: 14px;
@@ -847,6 +854,16 @@
               <div class="docente-flags">
                 <label><input type="radio" class="docente-prefix" name="docentePrefix1" value="prof" checked /> Prof.</label>
                 <label><input type="radio" class="docente-prefix" name="docentePrefix1" value="profssa" /> Prof.ssa</label>
+                <label>
+                  <input type="radio" class="docente-prefix" name="docentePrefix1" value="altro" />
+                  Altro
+                </label>
+                <input
+                  type="text"
+                  class="docente-prefix-custom"
+                  placeholder="Es. Avv."
+                  disabled
+                />
               </div>
               <input type="text" class="docente-nome" placeholder="Nome Docente 1" />
               <input type="text" class="docente-cognome" placeholder="Cognome Docente 1" />
@@ -1236,7 +1253,8 @@
           const nome = row.querySelector('.docente-nome')?.value ?? '';
           const cognome = row.querySelector('.docente-cognome')?.value ?? '';
           const prefix = row.querySelector('.docente-prefix:checked')?.value ?? 'prof';
-          return { nome: nome.trim(), cognome: cognome.trim(), prefix };
+          const customPrefix = row.querySelector('.docente-prefix-custom')?.value ?? '';
+          return { nome: nome.trim(), cognome: cognome.trim(), prefix, customPrefix: customPrefix.trim() };
         })
         .filter(({ nome, cognome }) => nome.length || cognome.length);
     }
@@ -1244,26 +1262,55 @@
     function formatDocentiList(docenti) {
       if (!docenti.length) return fallback.docenti;
       const normalized = docenti
-        .map(({ nome, cognome, prefix }) => {
+        .map(({ nome, cognome, prefix, customPrefix }) => {
           const parts = [];
           if (nome) parts.push(toTitleCase(nome));
           if (cognome) parts.push(toTitleCase(cognome));
+          let prefixLabel = 'Prof.';
+          if (prefix === 'profssa') {
+            prefixLabel = 'Prof.ssa';
+          } else if (prefix === 'altro') {
+            prefixLabel = customPrefix || 'Altro';
+          }
           return {
             fullName: parts.join(' ').trim(),
-            prefix: prefix === 'profssa' ? 'profssa' : 'prof'
+            prefix: prefix === 'profssa' ? 'profssa' : prefix === 'altro' ? 'altro' : 'prof',
+            prefixLabel
           };
         })
         .filter((item) => item.fullName);
 
       if (!normalized.length) return fallback.docenti;
 
-      if (normalized.length >= 2) {
-        const names = normalized.map((item) => item.fullName);
-        return `Proff. ${formatListWithE(names)}`;
+      const academic = normalized.filter((item) => item.prefix === 'prof' || item.prefix === 'profssa');
+      const extra = normalized.filter((item) => item.prefix === 'altro');
+
+      if (academic.length >= 2) {
+        if (!extra.length) return 'Proff.';
+        const extraWithPrefix = extra.map((item) => `${item.prefixLabel} ${item.fullName}`.trim());
+        return `Proff., ${formatListWithE(extraWithPrefix)}`;
       }
 
-      const onlyDocente = normalized[0];
-      return `${onlyDocente.prefix === 'profssa' ? 'Prof.ssa' : 'Prof.'} ${onlyDocente.fullName}`;
+      const docenteItems = normalized.map((item) => {
+        if (item.prefixLabel) return `${item.prefixLabel} ${item.fullName}`;
+        return item.fullName;
+      });
+      return formatListWithE(docenteItems);
+    }
+
+    function syncDocenteAltroFields() {
+      if (!docentiList) return;
+      const rows = Array.from(docentiList.querySelectorAll('.docente-row'));
+      rows.forEach((row) => {
+        const selectedPrefix = row.querySelector('.docente-prefix:checked')?.value ?? 'prof';
+        const altroInput = row.querySelector('.docente-prefix-custom');
+        if (!altroInput) return;
+        const isAltro = selectedPrefix === 'altro';
+        altroInput.disabled = !isAltro;
+        if (!isAltro) {
+          altroInput.value = '';
+        }
+      });
     }
 
     function getClassiData() {
@@ -1649,6 +1696,7 @@
     function updateAll() {
       updateTemplate(controls.indirizzo.value);
       syncBottomIcons();
+      syncDocenteAltroFields();
       updateText();
       fitTitleSizes();
       fitTitleInBox();
@@ -1723,6 +1771,8 @@
       flags.innerHTML = `
         <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="prof" checked /> Prof.</label>
         <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="profssa" /> Prof.ssa</label>
+        <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="altro" /> Altro</label>
+        <input type="text" class="docente-prefix-custom" placeholder="Es. Avv." disabled />
       `;
 
       row.appendChild(flags);
