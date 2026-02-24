@@ -450,10 +450,6 @@
       padding: 6px 8px;
     }
 
-    .docente-prefix-hidden {
-      display: none;
-    }
-
     .dropzone {
       border: 2px dashed rgba(17, 17, 17, 0.3);
       border-radius: 14px;
@@ -858,12 +854,13 @@
               <div class="docente-flags">
                 <label><input type="radio" class="docente-prefix" name="docentePrefix1" value="prof" checked /> Prof.</label>
                 <label><input type="radio" class="docente-prefix" name="docentePrefix1" value="profssa" /> Prof.ssa</label>
-                <input type="radio" class="docente-prefix docente-prefix-hidden" name="docentePrefix1" value="altro" />
+                <label><input type="radio" class="docente-prefix" name="docentePrefix1" value="altro" /> Altro</label>
                 <input
                   type="text"
                   class="docente-prefix-custom"
                   value="Altro"
                   placeholder="Altro"
+                  disabled
                 />
               </div>
               <input type="text" class="docente-nome" placeholder="Nome Docente 1" />
@@ -1303,8 +1300,11 @@
       if (!docentiList) return;
       const rows = Array.from(docentiList.querySelectorAll('.docente-row'));
       rows.forEach((row) => {
+        const selectedPrefix = row.querySelector('.docente-prefix:checked')?.value ?? 'prof';
         const altroInput = row.querySelector('.docente-prefix-custom');
         if (!altroInput) return;
+        const isAltro = selectedPrefix === 'altro';
+        altroInput.disabled = !isAltro;
         if (!altroInput.value.trim()) altroInput.value = 'Altro';
       });
     }
@@ -1767,8 +1767,8 @@
       flags.innerHTML = `
         <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="prof" checked /> Prof.</label>
         <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="profssa" /> Prof.ssa</label>
-        <input type="radio" class="docente-prefix docente-prefix-hidden" name="docentePrefix${docenteCount}" value="altro" />
-        <input type="text" class="docente-prefix-custom" value="Altro" placeholder="Altro" />
+        <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="altro" /> Altro</label>
+        <input type="text" class="docente-prefix-custom" value="Altro" placeholder="Altro" disabled />
       `;
 
       row.appendChild(flags);
@@ -1807,21 +1807,7 @@
       updateAll();
     }
 
-    function selectAltroPrefixFromInput(target) {
-      if (!target || !target.classList || !target.classList.contains('docente-prefix-custom')) return;
-      const row = target.closest('.docente-row');
-      if (!row) return;
-      const altroRadio = row.querySelector('.docente-prefix[value="altro"]');
-      if (altroRadio) altroRadio.checked = true;
-    }
-
     if (docentiList) {
-      docentiList.addEventListener('focusin', (event) => {
-        selectAltroPrefixFromInput(event.target);
-      });
-      docentiList.addEventListener('input', (event) => {
-        selectAltroPrefixFromInput(event.target);
-      });
       docentiList.addEventListener('input', updateAll);
       docentiList.addEventListener('change', updateAll);
     }
