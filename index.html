@@ -858,7 +858,7 @@
                 <input
                   type="text"
                   class="docente-prefix-custom"
-                  value="Altro"
+                  value=""
                   placeholder="Altro"
                   disabled
                 />
@@ -1310,7 +1310,6 @@
         if (!altroInput) return;
         const isAltro = selectedPrefix === 'altro';
         altroInput.disabled = !isAltro;
-        if (!altroInput.value.trim()) altroInput.value = 'Altro';
       });
     }
 
@@ -1773,7 +1772,7 @@
         <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="prof" checked /> Prof.</label>
         <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="profssa" /> Prof.ssa</label>
         <label><input type="radio" class="docente-prefix" name="docentePrefix${docenteCount}" value="altro" /> Altro</label>
-        <input type="text" class="docente-prefix-custom" value="Altro" placeholder="Altro" disabled />
+        <input type="text" class="docente-prefix-custom" value="" placeholder="Altro" disabled />
       `;
 
       row.appendChild(flags);
