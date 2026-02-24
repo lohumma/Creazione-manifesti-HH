@@ -310,15 +310,18 @@
       word-break: break-word;
     }
 
-    .poster-indirizzo-icon {
+    .poster-indirizzo-icon,
+    .poster-articolata-icon {
       position: absolute;
-      right: 50mm;
-      left: auto;
-      transform: none;
+      left: 0;
       width: calc(var(--icon-width) * 0.8);
       height: auto;
       z-index: 3;
       pointer-events: none;
+    }
+
+    .poster-articolata-icon {
+      display: none;
     }
 
 
@@ -1100,6 +1103,7 @@
     }
     const controls = {
       indirizzo: document.getElementById('indirizzo'),
+      articolataCon: document.getElementById('articolataCon'),
       titolo: document.getElementById('titolo'),
       sottotitolo: document.getElementById('sottotitolo'),
       anno: document.getElementById('anno')
@@ -1129,6 +1133,8 @@
     const addClasseBtn = document.getElementById('addClasseBtn');
     const removeClasseBtn = document.getElementById('removeClasseBtn');
     const posterIndirizzoIcon = document.getElementById('posterIndirizzoIcon');
+    const posterArticolataIcon = document.getElementById('posterArticolataIcon');
+    const posterInfoDown = document.getElementById('posterInfoDown');
     const posterUserImage = document.getElementById('posterUserImage');
     const posterUserImageImg = document.getElementById('posterUserImageImg');
     const imageDrop = document.getElementById('imageDrop');
@@ -1867,5 +1873,3 @@
   </script>
 </body>
 </html>
-
-
