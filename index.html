@@ -787,6 +787,23 @@
         </div>
 
         <div class="field">
+          <label for="articolataCon">Articolata con</label>
+          <select id="articolataCon">
+            <option selected>Nessuno</option>
+            <option>Informatica</option>
+            <option>Grafica</option>
+            <option>Telecomunicazioni</option>
+            <option>Scienze applicate</option>
+            <option>Meccanica</option>
+            <option>Elettronica</option>
+            <option>Energia</option>
+            <option>Fisica</option>
+            <option>Biologia</option>
+            <option>Standard</option>
+          </select>
+        </div>
+
+        <div class="field">
           <label>Classe</label>
           <div class="classi-list" id="classiList">
             <input type="text" class="classe-input" placeholder="Classe 1" value="4A INF" />
@@ -865,11 +882,12 @@
                 <rect class="frame-fill" x=".75" width="2012.6" height="297.64" />
               </svg>
               <img class="poster-logo-down" src="Frame/loghi_down.svg" alt="" />
-              <img class="poster-info-down" src="Frame/info_down.svg" alt="" />
+              <img class="poster-info-down" id="posterInfoDown" src="Frame/info_down.svg" alt="" />
             </div>
             <div class="poster-anno-top" id="posterAnnoTop">2025/26</div>
             <img class="poster-logo-up" id="posterLogoUp" src="Frame/loghi_up.svg" alt="" />
             <img class="poster-indirizzo-icon" id="posterIndirizzoIcon" src="Frame/info_icon.svg" alt="" />
+            <img class="poster-articolata-icon" id="posterArticolataIcon" src="" alt="" />
             <div class="poster-classe-top" id="posterClasseTop">4A INF</div>
             <div class="poster-user-image" id="posterUserImage">
               <img id="posterUserImageImg" alt="" />
@@ -1849,6 +1867,5 @@
   </script>
 </body>
 </html>
-
 
 
