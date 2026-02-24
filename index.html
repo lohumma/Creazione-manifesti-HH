@@ -127,6 +127,13 @@
       flex-wrap: wrap;
     }
 
+    .field-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
 
     button {
       border: none;
@@ -784,7 +791,10 @@
           <div class="classi-list" id="classiList">
             <input type="text" class="classe-input" placeholder="Classe 1" value="4A INF" />
           </div>
-          <button type="button" id="addClasseBtn">Aggiungi classe</button>
+          <div class="field-actions">
+            <button type="button" id="addClasseBtn">Aggiungi classe</button>
+            <button type="button" id="removeClasseBtn">Rimuovi classe</button>
+          </div>
         </div>
 
         <div class="field">
@@ -822,7 +832,10 @@
               <input type="text" class="docente-cognome" placeholder="Cognome Docente 1" />
             </div>
           </div>
-          <button type="button" id="addDocenteBtn">Aggiungi docenti</button>
+          <div class="field-actions">
+            <button type="button" id="addDocenteBtn">Aggiungi docenti</button>
+            <button type="button" id="removeDocenteBtn">Rimuovi docente</button>
+          </div>
         </div>
 
         <div class="controls-actions">
@@ -1093,8 +1106,10 @@
     const posterLogoUp = document.getElementById('posterLogoUp');
     const docentiList = document.getElementById('docentiList');
     const addDocenteBtn = document.getElementById('addDocenteBtn');
+    const removeDocenteBtn = document.getElementById('removeDocenteBtn');
     const classiList = document.getElementById('classiList');
     const addClasseBtn = document.getElementById('addClasseBtn');
+    const removeClasseBtn = document.getElementById('removeClasseBtn');
     const posterIndirizzoIcon = document.getElementById('posterIndirizzoIcon');
     const posterUserImage = document.getElementById('posterUserImage');
     const posterUserImageImg = document.getElementById('posterUserImageImg');
@@ -1616,7 +1631,7 @@
 
     function addDocenteRow() {
       if (!docentiList) return;
-      docenteCount += 1;
+      docenteCount = docentiList.querySelectorAll('.docente-row').length + 1;
       const row = document.createElement('div');
       row.className = 'docente-row';
 
@@ -1644,14 +1659,32 @@
       updateAll();
     }
 
+    function removeDocenteRow() {
+      if (!docentiList) return;
+      const rows = docentiList.querySelectorAll('.docente-row');
+      if (rows.length <= 1) return;
+      rows[rows.length - 1].remove();
+      docenteCount = rows.length - 1;
+      updateAll();
+    }
+
     function addClasseRow() {
       if (!classiList) return;
-      classeCount += 1;
+      classeCount = classiList.querySelectorAll('.classe-input').length + 1;
       const input = document.createElement('input');
       input.type = 'text';
       input.className = 'classe-input';
       input.placeholder = `Classe ${classeCount}`;
       classiList.appendChild(input);
+      updateAll();
+    }
+
+    function removeClasseRow() {
+      if (!classiList) return;
+      const inputs = classiList.querySelectorAll('.classe-input');
+      if (inputs.length <= 1) return;
+      inputs[inputs.length - 1].remove();
+      classeCount = inputs.length - 1;
       updateAll();
     }
 
@@ -1663,6 +1696,9 @@
     if (addDocenteBtn) {
       addDocenteBtn.addEventListener('click', addDocenteRow);
     }
+    if (removeDocenteBtn) {
+      removeDocenteBtn.addEventListener('click', removeDocenteRow);
+    }
 
     if (classiList) {
       classiList.addEventListener('input', updateAll);
@@ -1671,6 +1707,9 @@
 
     if (addClasseBtn) {
       addClasseBtn.addEventListener('click', addClasseRow);
+    }
+    if (removeClasseBtn) {
+      removeClasseBtn.addEventListener('click', removeClasseRow);
     }
 
     window.addEventListener('resize', fitPreview);
@@ -1810,7 +1849,6 @@
   </script>
 </body>
 </html>
-
 
 
 
