@@ -1254,7 +1254,10 @@
           const customPrefix = row.querySelector('.docente-prefix-custom')?.value ?? '';
           return { nome: nome.trim(), cognome: cognome.trim(), prefix, customPrefix: customPrefix.trim() };
         })
-        .filter(({ nome, cognome }) => nome.length || cognome.length);
+        .filter(({ nome, cognome, prefix, customPrefix }) => {
+          if (nome.length || cognome.length) return true;
+          return prefix === 'altro' && customPrefix.length > 0;
+        });
     }
 
     function formatDocentiList(docenti) {
@@ -1276,7 +1279,7 @@
             prefixLabel
           };
         })
-        .filter((item) => item.fullName);
+        .filter((item) => item.fullName || item.prefix === 'altro');
 
       if (!normalized.length) return fallback.docenti;
 
@@ -1285,12 +1288,14 @@
 
       if (academic.length >= 2) {
         if (!extra.length) return 'Proff.';
-        const extraWithPrefix = extra.map((item) => `${item.prefixLabel} ${item.fullName}`.trim());
+        const extraWithPrefix = extra.map((item) =>
+          `${item.prefixLabel}${item.fullName ? ` ${item.fullName}` : ''}`.trim()
+        );
         return `Proff., ${formatListWithE(extraWithPrefix)}`;
       }
 
       const docenteItems = normalized.map((item) => {
-        if (item.prefixLabel) return `${item.prefixLabel} ${item.fullName}`;
+        if (item.prefixLabel) return `${item.prefixLabel}${item.fullName ? ` ${item.fullName}` : ''}`.trim();
         return item.fullName;
       });
       return formatListWithE(docenteItems);
