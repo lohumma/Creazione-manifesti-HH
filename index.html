@@ -1194,25 +1194,22 @@
           const parts = [];
           if (nome) parts.push(toTitleCase(nome));
           if (cognome) parts.push(toTitleCase(cognome));
-          return { fullName: parts.join(' ').trim(), prefix: prefix === 'profssa' ? 'profssa' : 'prof' };
+          return {
+            fullName: parts.join(' ').trim(),
+            prefix: prefix === 'profssa' ? 'profssa' : 'prof'
+          };
         })
         .filter((item) => item.fullName);
+
       if (!normalized.length) return fallback.docenti;
 
-      const prof = normalized.filter((item) => item.prefix === 'prof').map((item) => item.fullName);
-      const profssa = normalized.filter((item) => item.prefix === 'profssa').map((item) => item.fullName);
-      const groups = [];
-
-      if (prof.length) {
-        groups.push(`Prof. ${formatListWithE(prof)}`);
-      }
-      if (profssa.length) {
-        const label = profssa.length > 1 ? 'Prof.sse' : 'Prof.ssa';
-        groups.push(`${label} ${formatListWithE(profssa)}`);
+      if (normalized.length >= 2) {
+        const names = normalized.map((item) => item.fullName);
+        return `Proff. ${formatListWithE(names)}`;
       }
 
-      if (!groups.length) return fallback.docenti;
-      return groups.join('\n');
+      const onlyDocente = normalized[0];
+      return `${onlyDocente.prefix === 'profssa' ? 'Prof.ssa' : 'Prof.'} ${onlyDocente.fullName}`;
     }
 
     function getClassiData() {
@@ -1813,7 +1810,6 @@
   </script>
 </body>
 </html>
-
 
 
 
