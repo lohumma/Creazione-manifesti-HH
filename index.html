@@ -1287,11 +1287,13 @@
       const extra = normalized.filter((item) => item.prefix === 'altro');
 
       if (academic.length >= 2) {
-        if (!extra.length) return 'Proff.';
+        const academicNames = academic.map((item) => item.fullName).filter(Boolean);
+        const academicText = academicNames.length ? `Proff. ${formatListWithE(academicNames)}` : 'Proff.';
+        if (!extra.length) return academicText;
         const extraWithPrefix = extra.map((item) =>
           `${item.prefixLabel}${item.fullName ? ` ${item.fullName}` : ''}`.trim()
         );
-        return `Proff., ${formatListWithE(extraWithPrefix)}`;
+        return `${academicText}, ${formatListWithE(extraWithPrefix)}`;
       }
 
       const docenteItems = normalized.map((item) => {
