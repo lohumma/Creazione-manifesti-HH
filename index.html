@@ -1171,22 +1171,37 @@
       poster.style.setProperty('--accent-2', tpl.accent2);
       poster.style.setProperty('--accent-3', tpl.accent3);
       poster.style.setProperty('--frame-color', tpl.frame || '#4285c6');
-      if (posterEls.icon) {
-        if (tpl.hideIcon) {
-          posterEls.icon.style.display = 'none';
-          poster.style.setProperty('--icon-width', '0mm');
-          poster.style.setProperty('--icon-gap', '0mm');
-        } else {
-          posterEls.icon.style.display = '';
-          poster.style.removeProperty('--icon-width');
-          poster.style.removeProperty('--icon-gap');
-          if (tpl.icon) {
-            posterEls.icon.src = tpl.icon;
-          }
-        }
-      }
       if (posterEls.sottotitolo) {
         posterEls.sottotitolo.style.visibility = tpl.hideSubtitle ? 'hidden' : '';
+      }
+    }
+
+    function getTemplateByIndirizzo(indirizzo) {
+      return templates[indirizzo] || null;
+    }
+
+    function syncBottomIcons() {
+      if (!posterIndirizzoIcon || !posterArticolataIcon) return;
+      const mainTemplate = currentTemplate;
+      const selectedArticolata = controls.articolataCon ? controls.articolataCon.value : 'Nessuno';
+      const articolataTemplate = selectedArticolata !== 'Nessuno' ? getTemplateByIndirizzo(selectedArticolata) : null;
+
+      const hideAllIcons = !!(mainTemplate && mainTemplate.hideIcon);
+      const showMainIcon = !hideAllIcons && !!(mainTemplate && mainTemplate.icon);
+      const showArticolataIcon = !hideAllIcons && !!(articolataTemplate && articolataTemplate.icon);
+
+      if (showMainIcon) {
+        posterIndirizzoIcon.src = mainTemplate.icon;
+        posterIndirizzoIcon.style.display = '';
+      } else {
+        posterIndirizzoIcon.style.display = 'none';
+      }
+
+      if (showArticolataIcon) {
+        posterArticolataIcon.src = articolataTemplate.icon;
+        posterArticolataIcon.style.display = '';
+      } else {
+        posterArticolataIcon.style.display = 'none';
       }
     }
 
@@ -1588,18 +1603,52 @@
     }
 
     function positionIndirizzoIcon() {
-      if (!poster || !posterIndirizzoIcon) return;
+      if (!poster || !posterIndirizzoIcon || !posterInfoDown) return;
       const pxPerMm = getPxPerMm();
       const frameHeight = imageFrame.bottomFrameHeightMm * pxPerMm;
       const frameTop = poster.offsetHeight - frameHeight;
-      const top = frameTop + (frameHeight - posterIndirizzoIcon.offsetHeight) / 2;
-      posterIndirizzoIcon.style.top = `${top}px`;
-      posterIndirizzoIcon.style.left = 'auto';
-      posterIndirizzoIcon.style.right = '50mm';
+      const gapPx = (5 * 96) / 25.4;
+      const zoneLeft = posterInfoDown.offsetLeft + posterInfoDown.offsetWidth;
+      const zoneRight = poster.offsetWidth;
+      const zoneCenter = zoneLeft + (zoneRight - zoneLeft) / 2;
+
+      const mainVisible = posterIndirizzoIcon.style.display !== 'none';
+      const articolataVisible =
+        posterArticolataIcon && posterArticolataIcon.style.display !== 'none';
+
+      const mainWidth = mainVisible ? posterIndirizzoIcon.offsetWidth : 0;
+      const articolataWidth =
+        articolataVisible && posterArticolataIcon ? posterArticolataIcon.offsetWidth : 0;
+
+      if (mainVisible && !articolataVisible) {
+        const mainLeft = zoneCenter - mainWidth / 2;
+        const mainTop = frameTop + (frameHeight - posterIndirizzoIcon.offsetHeight) / 2;
+        posterIndirizzoIcon.style.left = `${mainLeft}px`;
+        posterIndirizzoIcon.style.top = `${mainTop}px`;
+      }
+
+      if (!mainVisible && articolataVisible && posterArticolataIcon) {
+        const articolataLeft = zoneCenter - articolataWidth / 2;
+        const articolataTop = frameTop + (frameHeight - posterArticolataIcon.offsetHeight) / 2;
+        posterArticolataIcon.style.left = `${articolataLeft}px`;
+        posterArticolataIcon.style.top = `${articolataTop}px`;
+      }
+
+      if (mainVisible && articolataVisible && posterArticolataIcon) {
+        const totalWidth = mainWidth + gapPx + articolataWidth;
+        const startLeft = zoneCenter - totalWidth / 2;
+        const mainTop = frameTop + (frameHeight - posterIndirizzoIcon.offsetHeight) / 2;
+        const articolataTop = frameTop + (frameHeight - posterArticolataIcon.offsetHeight) / 2;
+        posterIndirizzoIcon.style.left = `${startLeft}px`;
+        posterIndirizzoIcon.style.top = `${mainTop}px`;
+        posterArticolataIcon.style.left = `${startLeft + mainWidth + gapPx}px`;
+        posterArticolataIcon.style.top = `${articolataTop}px`;
+      }
     }
 
     function updateAll() {
       updateTemplate(controls.indirizzo.value);
+      syncBottomIcons();
       updateText();
       fitTitleSizes();
       fitTitleInBox();
