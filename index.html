@@ -1667,7 +1667,8 @@
         articolataVisible && posterArticolataIcon ? posterArticolataIcon.offsetWidth : 0;
 
       if (mainVisible && !articolataVisible) {
-        const mainLeft = zoneCenter - mainWidth / 2;
+        const rightOffsetPx = 35 * pxPerMm;
+        const mainLeft = poster.offsetWidth - rightOffsetPx - mainWidth;
         const mainTop = frameTop + (frameHeight - posterIndirizzoIcon.offsetHeight) / 2;
         posterIndirizzoIcon.style.left = `${mainLeft}px`;
         posterIndirizzoIcon.style.top = `${mainTop}px`;
